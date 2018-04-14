@@ -4,3 +4,4 @@
 rm piCompile.sh
 git pull
 chmod +x piCompile.sh
+./piCompile.sh
