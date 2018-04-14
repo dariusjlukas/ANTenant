@@ -1,9 +1,8 @@
 #!/bin/bash
 #Raspberry pi compliling script
 
-echo "complieing..."
+echo "compiling..."
 
   g++ -c -g `pkg-config --cflags alsa` -o main.o ALSAtest.cpp
-  g++ -o main main.o
   g++ -o main main.o -lasound
   
