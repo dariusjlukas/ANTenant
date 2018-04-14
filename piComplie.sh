@@ -1,4 +1,8 @@
 #!/bin/bash
 #Raspberry pi compliling script
 
-echo Hello World!
+echo "complieing..."
+
+  g++ -c -g `pkg-config --cflags alsa` -o main.o main.c
+  g++ -o main main.o
+  g++ -o main main.o -l asound
