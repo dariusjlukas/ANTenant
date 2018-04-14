@@ -3,6 +3,7 @@
 
 echo "complieing..."
 
-  g++ -c -g `pkg-config --cflags alsa` -o main.o main.c
+  g++ -c -g `pkg-config --cflags alsa` -o main.o ALSAtest.cpp
   g++ -o main main.o
   g++ -o main main.o -l asound
+  
