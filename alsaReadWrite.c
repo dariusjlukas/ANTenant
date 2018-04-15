@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
+#include <asoundlib.h>
 	      
 main (int argc, char *argv[])
 {
@@ -13,7 +14,9 @@ main (int argc, char *argv[])
   char *buffer;
   int buffer_frames = 128;
   unsigned int rate = 44100;
+  snd_pcm_sframes_t frames; //Coppied
   snd_pcm_t *capture_handle;
+  snd_pcm_t *send_handle;
   snd_pcm_hw_params_t *hw_params;
 	snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
 
@@ -23,6 +26,26 @@ main (int argc, char *argv[])
              snd_strerror (err));
     exit (1);
   }
+
+// coppied //
+  if ((err = snd_pcm_open(&send_handle, "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+		printf("Playback open error: %s\n", snd_strerror(err));
+		exit(EXIT_FAILURE);
+	}
+
+    if ((err = snd_pcm_set_params(send_handle,
+		SND_PCM_FORMAT_U8,
+		SND_PCM_ACCESS_RW_INTERLEAVED,
+		1,
+		rate,
+		1,
+		500000)) < 0) {   /* 0.5sec */
+		printf("Playback open error: %s\n", snd_strerror(err));
+		exit(EXIT_FAILURE);
+	}
+
+// coppied //
+
 
   fprintf(stdout, "audio interface opened\n");
 		   
@@ -98,13 +121,27 @@ main (int argc, char *argv[])
 
   fprintf(stdout, "buffer allocated\n");
 
-  for (i = 0; i < 10; ++i) {
+  for (i = 0; i < 10; i=i) {
     if ((err = snd_pcm_readi (capture_handle, buffer, buffer_frames)) != buffer_frames) {
       fprintf (stderr, "read from audio interface failed (%s)\n",
                err, snd_strerror (err));
       exit (1);
     }
+
+// Coppied //
+    frames = snd_pcm_writei(send_handle, buffer, sizeof(buffer));
+		if (frames < 0)
+			frames = snd_pcm_recover(send_handle, frames, 0);
+		if (frames < 0) {
+			printf("snd_pcm_writei failed: %s\n", snd_strerror(frames));
+			break;
+		}
+		if (frames > 0 && frames < (long)sizeof(buffer))
+			printf("Short write (expected %li, wrote %li)\n", (long)sizeof(buffer), frames);
+// Coppied //
+
     fprintf(stdout, "read %d done\n", i);
+
   }
 
   free(buffer);
@@ -112,6 +149,7 @@ main (int argc, char *argv[])
   fprintf(stdout, "buffer freed\n");
 	
   snd_pcm_close (capture_handle);
+  snd_pcm_close(send_handle); //coppied
   fprintf(stdout, "audio interface closed\n");
 
   exit (0);
