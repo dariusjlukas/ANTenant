@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
 
-	      
+
 main (int argc, char *argv[])
 {
   int i;
@@ -89,7 +89,7 @@ main (int argc, char *argv[])
 	
   fprintf(stdout, "hw_params rate setted\n");
 
-  if ((err = snd_pcm_hw_params_set_channels (capture_handle, hw_params, 2)) < 0) {
+  if ((err = snd_pcm_hw_params_set_channels (capture_handle, hw_params, 1)) < 0) {
     fprintf (stderr, "cannot set channel count (%s)\n",
              snd_strerror (err));
     exit (1);
@@ -140,7 +140,7 @@ main (int argc, char *argv[])
 			printf("Short write (expected %li, wrote %li)\n", (long)sizeof(buffer), frames);
 // Coppied //
 
-    fprintf(stdout, "read %d done\n", i);
+   // fprintf(stdout, "read %d done\n", i);
 
   }
 
