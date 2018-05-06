@@ -114,10 +114,10 @@ void setup() {
     transmit_mode = digitalRead(2);
     if (transmit_mode == HIGH) {
         Serial.println("TX Begin");
-
+        role = TX;
     } else {
         Serial.println("RX Begin");
-
+        role = RX;
     }
 
 
@@ -159,40 +159,40 @@ void setup() {
     radio.setRetries(2,5);                  // Optionally, increase the delay between retries & # of retries
 
     radio.setCRCLength(RF24_CRC_8);          // Use 8-bit CRC for performance
-    radio.openWritingPipe(addresses[0]);
-    radio.openReadingPipe(1,addresses[1]);
+    // radio.openWritingPipe(addresses[0]);
+    // radio.openReadingPipe(1,addresses[1]);
 
-      role = digitalRead(2);
-      if (role == HIGH) {
-          Serial.println("TX Begin");
+      //role = digitalRead(2);
+      // if (role == HIGH) {
+      //     Serial.println("TX Begin");
+      //
+      // } else {
+      //     Serial.println("RX Begin");
+      //
+      // }
 
-      } else {
-          Serial.println("RX Begin");
-
+      // Open a writing and reading pipe on each radio, with opposite addresses
+      if(role == TX){
+        radio.openWritingPipe(addresses[1]);
+        radio.openReadingPipe(1,addresses[0]);
+        radio.stopListening();
+      }else{
+        radio.openWritingPipe(addresses[0]);
+        radio.openReadingPipe(1,addresses[1]);
+        radio.startListening();                 // Start listening
       }
-
-    // Open a writing and reading pipe on each radio, with opposite addresses
-    if(role == TX){
-      radio.openWritingPipe(addresses[1]);
-      radio.openReadingPipe(1,addresses[0]);
-      radio.stopListening();
-    }else{
-      radio.openWritingPipe(addresses[0]);
-      radio.openReadingPipe(1,addresses[1]);
-      radio.startListening();                 // Start listening
-    }
 
 
     radio.printDetails();                   // Dump the configuration of the rf unit for debugging
 
-    Serial.println(F("\n\rRF24/examples/Transfer/"));
-    Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
+    // Serial.println(F("\n\rRF24/examples/Transfer/"));
+    // Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
 
-    randomSeed(analogRead(0));              //Seed for random number generation
+  //  randomSeed(analogRead(0));              //Seed for random number generation
 
-     for(int i=0; i<32; i++){
-        data[i] = random(255);               //Load the buffer with random data
-     }
+  //   for(int i=0; i<32; i++){
+  //      data[i] = random(255);               //Load the buffer with random data
+  //   }
     radio.powerUp();                        //Power up the radio
 
 }
@@ -212,7 +212,7 @@ uint32_t counter =0;
 void loop() {
 
 
-   if (transmit_mode == HIGH) {
+   if (role == TX) {
 
         if(queue1.available() >= 1){
             memcpy( audio_buffer,queue1.readBuffer(), AUDIO_BYTE_BUFFER );
@@ -225,7 +225,7 @@ void loop() {
              // write ever other pair of 2 bytes (16 bits) to hardware serial 1
              //We are not using serial
             // if (Serial1.availableForWrite() ) {
-
+              //if(radio.available()){
                  uint8_t b = 0;
                  for( int i = 0 ; i < AUDIO_BYTE_BUFFER ; i=i+(2*SKIP) ){
                      small_buffer[b] = audio_buffer[i];
@@ -239,6 +239,7 @@ void loop() {
                         counter++;
                     }   //Write to the FIFO buffers
                 }
+              //}
 
               //for(int i = 0; i < 4; i++){
                //if(radio.writeFast(&data,32)){   //Write to the FIFO buffers
@@ -248,7 +249,7 @@ void loop() {
 
 
 
-             }
+
 
             // Play audio on local headphones
             if(queueOut.available()){
@@ -258,6 +259,7 @@ void loop() {
 
              }
 
+           }
         // }
 
     } else {
@@ -266,8 +268,8 @@ void loop() {
         //A: This is the transmit code. B: We are not using serial
         int b=0;
       //  if(  (b = Serial1.available())  >= 64   ) {
-
-        while(b < SMALL_BUFFER){
+        int lastTime = millis();
+        while(b < SMALL_BUFFER && (millis() - lastTime < 10)){
           if(radio.available()){
             radio.read(&(small_buffer[b]),32);
             b += 32;
@@ -311,7 +313,8 @@ void loop() {
 
 
     if (millis() - last_millis > 1000) {
-
+        if (role == TX) Serial.println("TX");
+        else Serial.println("RX");
         Serial.print("AudioMemoryUsage: ");
         Serial.println(AudioMemoryUsageMax());
        Serial.print("counter : ");
@@ -322,6 +325,27 @@ void loop() {
        AudioMemoryUsageMaxReset();
 
     }
+
+    // Open a writing and reading pipe on each radio, with opposite addresses
+    bool currentRole = digitalRead(2);
+    if(currentRole != role){
+      role = currentRole;
+      if(role == TX){
+        Serial.println("Opening Pipes TX");
+        radio.openWritingPipe(addresses[1]);
+        radio.openReadingPipe(1,addresses[0]);
+        Serial.println("Pipes Open");
+        delay(20);
+        radio.stopListening();
+      }else{
+        Serial.println("Opening Pipes RX");
+        radio.openWritingPipe(addresses[0]);
+        radio.openReadingPipe(1,addresses[1]);
+        Serial.println("Pipes Open");
+        radio.startListening();                 // Start listening
+      }
+    Serial.println(role);
+  }
 
 
 }
