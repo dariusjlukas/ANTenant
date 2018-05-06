@@ -80,7 +80,7 @@ bool transmit_mode = LOW;
 //Radio Setup//
 /*************  USER Configuration *****************************/
 // Hardware configuration
-RF24 radio(7,A6);                     // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
+RF24 radio(7,A6);                     // Set up nRF24L01 radio on SPI bus plus pins 7 & A6
 
 /***************************************************************/
 
