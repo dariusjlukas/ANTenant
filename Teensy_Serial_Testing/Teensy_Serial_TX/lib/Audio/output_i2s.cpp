@@ -255,20 +255,11 @@ void AudioOutputI2S::update(void)
 //
 #if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
   // PLL is at 96 MHz in these modes
-//  #define MCLK_MULT 2
-//  #define MCLK_DIV  17
+  #define MCLK_MULT 2
+  #define MCLK_DIV  17
 
-  #define MCLK_MULT 1
-  #define MCLK_DIV  34
-
-//  #define MCLK_MULT 1
-//  #define MCLK_DIV  68
-
-//  #define MCLK_MULT 1    // did not seem to work
-//  #define MCLK_DIV  136
-
-
-
+	//	#define MCLK_MULT 1
+	//	#define MCLK_DIV  34
 #elif F_CPU == 72000000
   #define MCLK_MULT 8
   #define MCLK_DIV  51
@@ -429,5 +420,3 @@ void AudioOutputI2Sslave::config_i2s(void)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 }
-
-

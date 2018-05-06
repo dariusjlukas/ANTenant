@@ -98,11 +98,11 @@ void setup() {
     }
 
 
-    Serial1.begin(115200);
+    Serial1.begin(921600);
    // Serial1.begin(230400);
 
 
-    amp1.gain(8);
+    amp1.gain(5);
     queue1.begin();
 
 }
@@ -111,7 +111,7 @@ void setup() {
 uint32_t last_millis = 0;
 
 #define AUDIO_BYTE_BUFFER  256 //AUDIO_BLOCK_SAMPLES*2  // 16 bit buffer to byte buffer
-#define SKIP  2
+#define SKIP  4
 #define SMALL_BUFFER   AUDIO_BYTE_BUFFER/SKIP
 
 byte small_buffer[SMALL_BUFFER];
@@ -144,11 +144,17 @@ void loop() {
                 counter += Serial1.write(small_buffer,SMALL_BUFFER);
 
 
-                // Play audio on local headphones
-                int16_t *out_buffer = queueOut.getBuffer();
-                memcpy(out_buffer,serial_buffer,AUDIO_BYTE_BUFFER);
-                queueOut.playBuffer();
+
             }
+
+            // Play audio on local headphones
+            if(queueOut.available()){
+            int16_t *out_buffer = queueOut.getBuffer();
+            memcpy(out_buffer,serial_buffer,AUDIO_BYTE_BUFFER);
+            queueOut.playBuffer();
+
+          }
+
        }
 
     } else {

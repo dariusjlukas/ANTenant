@@ -28,7 +28,7 @@
  * SOFTWARE.
  */
 
-#define __MK20DX128__ 
+#define __MK20DX128__
 #include <Arduino.h>
 
 
@@ -37,7 +37,7 @@
 //
 // http://www.pjrc.com/store/audio_tutorial_kit.html
 // https://hackaday.io/project/8292-microcontroller-audio-workshop-had-supercon-2015
-// 
+//
 // Part 1-2: Test Hardware
 //
 // Simple beeping is pre-loaded on the Teensy, so
@@ -65,7 +65,7 @@
 //#include "AudioSampleGong.h"
 //#include "play_queue.h"
 //#include "mixer.h"
-//#include "effect_delay.h"  
+//#include "effect_delay.h"
 
 
 // GUItool: begin automatically generated code
@@ -104,9 +104,9 @@ void setup() {
     pinMode(2, INPUT);
 
     delay(300);
-    
+
     Serial.begin(115200);
-    // 
+    //
 
 //    while (!Serial.available()) {
 //    //    digitalWrite(13, !digitalRead(13));
@@ -126,7 +126,7 @@ void setup() {
 
     Serial1.begin(115200);
    // Serial1.begin(230400);
-    
+
     pinMode(13, INPUT);
     // digitalWrite(13,HIGH);
 
@@ -134,7 +134,7 @@ void setup() {
     //    mix1.gain(1, 1);
 
     //  delayOut.delay(0,80);
-    amp1.gain(13);
+    amp1.gain(6);
     //  queue1.begin();
 
 
@@ -152,7 +152,7 @@ byte small_buffer[SMALL_BUFFER+1];
 //byte serial_buffer[AUDIO_BYTE_BUFFER];
 
 
-uint32_t counter =0;
+uint32_t counter = 0;
 void loop() {
 
 
@@ -171,7 +171,7 @@ void loop() {
                 small_buffer[i]= Serial1.read();
                 ++counter;
             }
-            
+
             byte new_buffer[AUDIO_BYTE_BUFFER];
             for(uint16_t s = 0; s < b; s = s + 2 ){
 
@@ -179,7 +179,7 @@ void loop() {
                     new_buffer[(s*SKIP)+(i*SKIP)] =  small_buffer[s];
                     new_buffer[(s*SKIP)+(i*SKIP)+1] =  small_buffer[s+1];
                 }
-            }            
+            }
             if( queueOut.available()){
                 int16_t *out_buffer = queueOut.getBuffer();
                 memcpy(out_buffer,new_buffer,b*SKIP);
@@ -187,10 +187,10 @@ void loop() {
             }
 
         }
-         
-    }    
-    
-    
+
+    }
+
+
 
 
 
@@ -199,7 +199,7 @@ void loop() {
 //        Serial.print("AudioMemoryUsage: ");
 //        Serial.println(AudioMemoryUsageMax());
        Serial.print("counter : ");
-       Serial.println(counter);        
+       Serial.println(counter);
        counter =0;
         last_millis = millis();
 
