@@ -90,7 +90,7 @@ byte data[32];                           //Data buffer for testing data transfer
 
 //unsigned long counter, rxTimer;          //Counter and timer for keeping track transfer info
 unsigned long startTime, stopTime;
-bool TX=1,RX=0,role=0;
+bool TX=0,RX=1,role=1;
 
 bool radioNumber = 0;
 
@@ -99,7 +99,7 @@ void setup() {
 
 
 
-    pinMode(2, INPUT);
+    pinMode(2, INPUT_PULLUP);
 
     delay(300);
     Serial.begin(115200);
@@ -112,7 +112,7 @@ void setup() {
 
 
     transmit_mode = digitalRead(2);
-    if (transmit_mode == HIGH) {
+    if (transmit_mode == LOW) {
         Serial.println("TX Begin");
         role = TX;
     } else {

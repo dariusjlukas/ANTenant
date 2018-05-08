@@ -31,8 +31,9 @@
  //This is the Teensy transmit demonstration code. It is based on
  //several example programs modified for our purposes
 
+#define TRUE 1
+#define FALSE 0
 #define DEBUG TRUE
-
 #define __MK20DX128__
 #include <Arduino.h>
 
@@ -92,7 +93,7 @@ byte data[32];                           //Data buffer for testing data transfer
 
 //unsigned long counter, rxTimer;          //Counter and timer for keeping track transfer info
 unsigned long startTime, stopTime;
-bool TX=1,RX=0,role=0;
+bool TX=0,RX=1,role=1;
 
 bool radioNumber = 0;
 
@@ -101,7 +102,7 @@ void setup() {
 
 
 
-    pinMode(2, INPUT);
+    pinMode(2, INPUT_PULLUP);
 
     delay(300);
     if(DEBUG == TRUE){
@@ -116,7 +117,7 @@ void setup() {
 
 
     transmit_mode = digitalRead(2);
-    if (transmit_mode == HIGH) {
+    if (transmit_mode == LOW) {
         if(DEBUG == TRUE){Serial.println("TX Begin");}
         role = TX;
     } else {
