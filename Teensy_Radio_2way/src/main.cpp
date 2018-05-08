@@ -33,7 +33,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define DEBUG TRUE
+#define DEBUG FALSE
 #define __MK20DX128__
 #include <Arduino.h>
 
@@ -96,6 +96,9 @@ unsigned long startTime, stopTime;
 bool TX=0,RX=1,role=1;
 
 bool radioNumber = 0;
+
+uint32_t lastMuteTime = 0;
+int audioTimeout = 0;
 
 void setup() {
     AudioMemory(90);
@@ -273,6 +276,28 @@ void loop() {
         //A: This is the transmit code. B: We are not using serial
         int b=0;
       //  if(  (b = Serial1.available())  >= 64   ) {
+
+      //radio muting logic to stop the speaker to play static when nobody is
+      //transmitting
+
+        if(radio.available() == FALSE){
+          if(lastMuteTime + 400 < millis()){
+            audioTimeout ++;
+            lastMuteTime = millis();
+        }
+      }
+
+      if(radio.available() == TRUE){
+        audioTimeout = 0;
+      }
+
+      if(audioTimeout > 2){
+        if(DEBUG == TRUE){Serial.println("Audio Muted");}
+      }
+      else{
+        if(DEBUG == TRUE){Serial.println("Unmuted");}
+
+
         int lastTime = millis();
         while(b < SMALL_BUFFER && (millis() - lastTime < 10)){
           if(radio.available()){
@@ -299,6 +324,8 @@ void loop() {
             int16_t *out_buffer = queueOut.getBuffer();
             memcpy(out_buffer,new_buffer,b*SKIP);
             queueOut.playBuffer();
+
+          }
 
       //  }
       // if(millis() - rxTimer > 1000){
